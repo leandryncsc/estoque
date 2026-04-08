@@ -313,12 +313,12 @@ const ImprovedMiniPOS = () => {
 
   return (
     <>
-      <div className="h-full flex gap-6 print:hidden">
+      <div className="h-full flex flex-col xl:flex-row gap-4 lg:gap-6 print:hidden">
       {/* Products Section */}
-      <div className="flex-1 space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="flex-1 space-y-4 min-w-0">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Produtos</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground">Produtos</h2>
           </div>
         </div>
 
@@ -347,7 +347,7 @@ const ImprovedMiniPOS = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 max-h-[calc(100dvh-240px)] xl:max-h-[calc(100dvh-220px)] overflow-y-auto pr-1">
             {filteredProducts.map((product) => (
               <Card key={product.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => addToCart(product)}>
                 <CardContent className="p-4">
@@ -392,7 +392,7 @@ const ImprovedMiniPOS = () => {
       </div>
 
       {/* Cart Section */}
-      <div className="w-96 space-y-4">
+      <div className="w-full xl:w-96 xl:min-w-96 space-y-4">
         <Card className="h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -402,7 +402,7 @@ const ImprovedMiniPOS = () => {
           </CardHeader>
           <CardContent className="p-0">
             {/* Cart Items */}
-            <div className="max-h-64 overflow-y-auto">
+            <div className="max-h-60 sm:max-h-64 overflow-y-auto">
               {cart.length === 0 ? (
                 <div className="p-6 text-center text-muted-foreground">
                   <ShoppingCart className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -421,10 +421,11 @@ const ImprovedMiniPOS = () => {
                           })}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 shrink-0">
                         <Button
                           size="sm"
                           variant="outline"
+                          className="h-8 w-8 p-0"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         >
                           <Minus className="w-3 h-3" />
@@ -435,6 +436,7 @@ const ImprovedMiniPOS = () => {
                         <Button
                           size="sm"
                           variant="outline"
+                          className="h-8 w-8 p-0"
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         >
                           <Plus className="w-3 h-3" />
@@ -442,6 +444,7 @@ const ImprovedMiniPOS = () => {
                         <Button
                           size="sm"
                           variant="destructive"
+                          className="h-8 w-8 p-0"
                           onClick={() => removeFromCart(item.id)}
                         >
                           <Trash2 className="w-3 h-3" />

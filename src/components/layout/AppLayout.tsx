@@ -52,8 +52,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     navigate("/login");
   }
 
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
   return (
-    <div className="h-screen bg-background flex overflow-hidden print:h-auto print:block print:bg-white print:overflow-visible">
+    <div className="min-h-dvh bg-background flex overflow-hidden print:h-auto print:block print:bg-white print:overflow-visible">
       {/* Sidebar */}
       <div className={cn(
         "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0 print:hidden",
@@ -113,10 +117,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </div>
       </div>
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden print:overflow-visible">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden print:overflow-visible">
         {/* Header */}
-        <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 lg:px-6 print:hidden">
-          <div className="flex items-center gap-4">
+        <header className="h-16 bg-card border-b border-border flex items-center justify-between px-3 sm:px-4 lg:px-6 print:hidden">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <Button
               variant="ghost"
               size="sm"
@@ -125,11 +129,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
-            <div className="hidden sm:block">
-              <h2 className="text-lg font-semibold text-foreground">Sistema de Gerenciamento</h2>
+            <div className="hidden sm:block min-w-0">
+              <h2 className="text-base lg:text-lg font-semibold text-foreground truncate">Sistema de Gerenciamento</h2>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <ThemeSwitch />
             <Button variant="default" size="sm" className="hidden sm:flex" asChild>
               <NavLink to="/pos">
@@ -141,7 +145,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-auto p-4 lg:p-6 print:p-0 print:overflow-visible">
+        <main className="flex-1 overflow-auto p-3 sm:p-4 lg:p-6 print:p-0 print:overflow-visible">
           {children}
         </main>
         {/* Footer */}

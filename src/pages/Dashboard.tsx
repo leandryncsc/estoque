@@ -169,7 +169,7 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -180,26 +180,26 @@ const Dashboard = () => {
               Acesso rápido às principais funcionalidades
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="h-20 flex-col gap-2" asChild>
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <Button variant="outline" className="h-16 sm:h-20 flex-col gap-1 sm:gap-2" asChild>
               <NavLink to="/products">
                 <Package className="w-6 h-6" />
                 <span>Novo Produto</span>
               </NavLink>
             </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2" asChild>
+            <Button variant="outline" className="h-16 sm:h-20 flex-col gap-1 sm:gap-2" asChild>
               <NavLink to="/suppliers">
                 <Users className="w-6 h-6" />
                 <span>Fornecedor</span>
               </NavLink>
             </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2" asChild>
+            <Button variant="outline" className="h-16 sm:h-20 flex-col gap-1 sm:gap-2" asChild>
               <NavLink to="/entries">
                 <TrendingUp className="w-6 h-6" />
                 <span>Entrada</span>
               </NavLink>
             </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2" asChild>
+            <Button variant="outline" className="h-16 sm:h-20 flex-col gap-1 sm:gap-2" asChild>
               <NavLink to="/reports">
                 <BarChart3 className="w-6 h-6" />
                 <span>Relatórios</span>
