@@ -99,6 +99,15 @@ const Entries = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const formatCurrency = (value: unknown) => {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return "-";
+    return numericValue.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
+
   const { data: entries, isLoading } = useQuery({
     queryKey: ['stock-entries'],
     queryFn: async () => {
@@ -289,8 +298,8 @@ const Entries = () => {
                 <div key={p.id} className="border rounded p-3 flex flex-col gap-1">
                   <span className="font-semibold text-foreground">{p.name}</span>
                   {p.sku && <span className="text-xs text-muted-foreground">SKU: {p.sku}</span>}
-                  <span className="text-xs text-muted-foreground">Custo: {typeof p.cost_price === 'number' ? p.cost_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</span>
-                  <span className="text-xs text-muted-foreground">Venda: {typeof p.sale_price === 'number' ? p.sale_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</span>
+                  <span className="text-xs text-muted-foreground">Custo: {formatCurrency(p.cost_price)}</span>
+                  <span className="text-xs text-muted-foreground">Venda: {formatCurrency(p.sale_price)}</span>
                   <span className="text-xs text-muted-foreground">Estoque: {typeof p.stock_quantity === 'number' ? p.stock_quantity : '-'}</span>
                 </div>
               ))}
