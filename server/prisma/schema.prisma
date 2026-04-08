@@ -115,8 +115,8 @@ enum user_role {
 
 model system_settings {
   id                   String   @id @default("1")
-  companyName          String   @default("StockPro")
-  companyEmail         String   @default("admin@stockpro.com")
+  companyName          String   @default("Supermercado")
+  companyEmail         String   @default("admin@supermercado.com")
   companyPhone         String   @default("")
   companyAddress       String   @default("")
   lowStockAlert        Int      @default(10)

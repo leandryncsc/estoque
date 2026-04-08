@@ -654,7 +654,7 @@ const ImprovedMiniPOS = () => {
             printFormat === '80mm' ? "w-[80mm] text-[11px]" : "w-full max-w-3xl text-[14px]"
           )} style={{ fontFamily: "'Courier New', Courier, monospace" }}>
             <div className="text-center mb-4">
-              <p className={cn("font-bold uppercase", printFormat === '80mm' ? "text-sm" : "text-xl")}>{settings?.companyName || "LOJA DEMO (STOCKPRO)"}</p>
+              <p className={cn("font-bold uppercase", printFormat === '80mm' ? "text-sm" : "text-xl")}>{settings?.companyName || "LOJA DEMO"}</p>
               <p>{settings?.companyAddress || "Endereço não informado"}</p>
               <p>Telefone: {settings?.companyPhone || "Não informado"}</p>
             <div className="border-b border-dashed border-black my-2"></div>

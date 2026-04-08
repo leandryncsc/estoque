@@ -66,8 +66,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               <Package className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">StockPro</h1>
-              <p className="text-xs text-muted-foreground">Admin Dashboard</p>
+              <h1 className="text-xl font-bold text-foreground">Supermercado</h1>
+              <p className="text-xs text-muted-foreground">Sistema de Gerenciamento</p>
             </div>
           </div>
 

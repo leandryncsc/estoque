@@ -16,8 +16,8 @@ router.get('/', authenticateToken, async (req, res) => {
     } else {
       // Se não houver configurações, retornamos valores padrões
       res.json({
-        companyName: "StockPro",
-        companyEmail: "admin@stockpro.com",
+        companyName: "Supermercado",
+        companyEmail: "admin@supermercado.com",
         companyPhone: "",
         companyAddress: "",
         lowStockAlert: 10,
