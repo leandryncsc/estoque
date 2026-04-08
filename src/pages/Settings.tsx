@@ -382,8 +382,8 @@ const Settings = () => {
                           <p className="font-medium text-foreground">{u.name}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">ID: {u.user_id?.split('-')[0]}...</p>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <div className="text-right flex flex-col justify-center items-end">
+                        <div className="flex w-full sm:w-auto flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                          <div className="text-left sm:text-right flex flex-col justify-center sm:items-end">
                             <span className={`px-2 py-1 rounded text-xs font-semibold ${u.role === 'administrador' || u.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-accent/20 text-accent-foreground'}`}>
                               {u.role === 'administrador' || u.role === 'admin' ? 'Admin' : 'Vendedor'}
                             </span>
@@ -391,9 +391,9 @@ const Settings = () => {
                               <p className="text-xs text-muted-foreground mt-1.5">Filial: {u.filiais.nome}</p>
                             )}
                           </div>
-                          <div className="flex flex-col gap-1 sm:flex-row shrink-0">
-                            <Button size="sm" variant="outline" onClick={() => setEditUsuario(u)}>Editar</Button>
-                            <Button size="sm" variant="destructive" onClick={() => handleDeleteUsuario(u.user_id)}>Excluir</Button>
+                          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-1 shrink-0 w-full sm:w-auto">
+                            <Button size="sm" variant="outline" className="w-full sm:w-auto" onClick={() => setEditUsuario(u)}>Editar</Button>
+                            <Button size="sm" variant="destructive" className="w-full sm:w-auto" onClick={() => handleDeleteUsuario(u.user_id)}>Excluir</Button>
                           </div>
                         </div>
                       </>
