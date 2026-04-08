@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface Product {
   id: string;
@@ -90,7 +91,8 @@ const ImprovedMiniPOS = () => {
   const [amountPaid, setAmountPaid] = useState<number>(0);
   const [completedSaleData, setCompletedSaleData] = useState<any>(null);
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
-  const { toast } = useToast();
+  const [printFormat, setPrintFormat] = useState<'80mm' | 'a4'>('80mm');
+  const { toast, dismiss } = useToast();
   const queryClient = useQueryClient();
 
   // Load products filtrando por filial
@@ -589,14 +591,47 @@ const ImprovedMiniPOS = () => {
             <DialogTitle>Venda Finalizada!</DialogTitle>
             <DialogDescription>Deseja imprimir o cupom não fiscal/recibo desta venda?</DialogDescription>
           </DialogHeader>
-          <div className="flex justify-center p-4 bg-muted/50 rounded-md">
-             <Receipt className="w-16 h-16 text-muted-foreground" />
+          
+          <div className="flex flex-col gap-4 py-2">
+            <div className="space-y-3">
+              <label className="text-sm font-medium">Formato de Impressão</label>
+              <div className="grid grid-cols-2 gap-4">
+                <Button 
+                   variant={printFormat === '80mm' ? 'default' : 'outline'} 
+                   onClick={() => setPrintFormat('80mm')}
+                   className="flex flex-col h-auto py-4 gap-2"
+                >
+                  <Receipt className="w-6 h-6" />
+                  <span>Bobina 80mm</span>
+                  <span className="text-xs font-normal opacity-70">PDV / ECF</span>
+                </Button>
+                <Button 
+                   variant={printFormat === 'a4' ? 'default' : 'outline'} 
+                   onClick={() => setPrintFormat('a4')}
+                   className="flex flex-col h-auto py-4 gap-2"
+                >
+                  <Printer className="w-6 h-6" />
+                  <span>Folha A4</span>
+                  <span className="text-xs font-normal opacity-70">Impressora comum</span>
+                </Button>
+              </div>
+            </div>
           </div>
+          
           <DialogFooter className="flex space-x-2">
             <Button variant="outline" onClick={() => setShowReceiptDialog(false)}>
               Novo Pedido
             </Button>
-            <Button className="gap-2" onClick={() => window.print()}>
+            <Button className="gap-2" onClick={() => {
+              // Limpar avisos/toasts antes da impressão
+              dismiss(); 
+              // Fechar o próprio dialog de impressão antes de abrir a janela do sistema
+              setShowReceiptDialog(false);
+              // Pequeno atraso para a animação do dialog/toast sumir da tela
+              setTimeout(() => {
+                window.print();
+              }, 300);
+            }}>
               <Printer className="w-4 h-4" />
               Imprimir Cupom
             </Button>
@@ -606,14 +641,25 @@ const ImprovedMiniPOS = () => {
 
       {/* Print-only Receipt (Cupom) */}
       {completedSaleData && (
-        <div className="hidden print:block w-[80mm] text-black bg-white p-2 font-mono text-[11px] leading-tight mx-auto" style={{ fontFamily: "'Courier New', Courier, monospace" }}>
-          <div className="text-center mb-4">
-            <p className="font-bold text-sm uppercase">{settings?.companyName || "LOJA DEMO (STOCKPRO)"}</p>
-            <p>{settings?.companyAddress || "Endereço não informado"}</p>
-            <p>Telefone: {settings?.companyPhone || "Não informado"}</p>
+        <>
+          {/* Dynamic Page Styling for Print Roll format */}
+          {printFormat === '80mm' && (
+            <style type="text/css" media="print">
+              {`@page { size: 80mm auto; margin: 0; }`}
+            </style>
+          )}
+
+          <div className={cn(
+            "hidden print:block text-black bg-white p-4 font-mono leading-tight mx-auto",
+            printFormat === '80mm' ? "w-[80mm] text-[11px]" : "w-full max-w-3xl text-[14px]"
+          )} style={{ fontFamily: "'Courier New', Courier, monospace" }}>
+            <div className="text-center mb-4">
+              <p className={cn("font-bold uppercase", printFormat === '80mm' ? "text-sm" : "text-xl")}>{settings?.companyName || "LOJA DEMO (STOCKPRO)"}</p>
+              <p>{settings?.companyAddress || "Endereço não informado"}</p>
+              <p>Telefone: {settings?.companyPhone || "Não informado"}</p>
             <div className="border-b border-dashed border-black my-2"></div>
             <p>{format(new Date(completedSaleData.date), "dd/MM/yyyy HH:mm:ss")} CCF:{completedSaleData.id.slice(-6).toUpperCase()}</p>
-            <p className="font-bold text-sm my-1">CUPOM NÃO FISCAL</p>
+              <p className={cn("font-bold my-1", printFormat === '80mm' ? "text-sm" : "text-lg")}>CUPOM NÃO FISCAL</p>
           </div>
           
           <div className="border-b border-dashed border-black mb-2"></div>
@@ -634,7 +680,7 @@ const ImprovedMiniPOS = () => {
             <div className="border-b border-dashed border-black mb-2"></div>
             
             {completedSaleData.cart.map((item: any, index: number) => (
-              <div key={index} className="mb-1 text-[10px]">
+              <div key={index} className={cn("mb-1", printFormat === '80mm' ? "text-[10px]" : "text-[12px]")}>
                 <div className="flex justify-between">
                   <div className="w-[12%]">{String(index + 1).padStart(3, '0')}</div>
                   <div className="w-[33%]">{item.sku || 'S/N'}</div>
@@ -652,18 +698,18 @@ const ImprovedMiniPOS = () => {
           
           <div className="border-b border-dashed border-black my-2"></div>
           
-          <div className="flex justify-between font-bold text-sm">
+          <div className={cn("flex justify-between font-bold", printFormat === '80mm' ? "text-sm" : "text-lg")}>
             <span>TOTAL R$</span>
             <span>{completedSaleData.total.toFixed(2).replace('.', ',')}</span>
           </div>
           
           <div className="flex justify-between mt-1">
-            <span className="capitalize text-xs">{completedSaleData.payment.replace('_', ' ')}</span>
+            <span className={cn("capitalize", printFormat === '80mm' ? "text-xs" : "text-sm")}>{completedSaleData.payment.replace('_', ' ')}</span>
             <span>{completedSaleData.amountPaid > 0 ? completedSaleData.amountPaid.toFixed(2).replace('.', ',') : completedSaleData.total.toFixed(2).replace('.', ',')}</span>
           </div>
           
           {completedSaleData.change > 0 && (
-            <div className="flex justify-between text-xs">
+            <div className={cn("flex justify-between", printFormat === '80mm' ? "text-xs" : "text-sm")}>
               <span>Troco</span>
               <span>{completedSaleData.change.toFixed(2).replace('.', ',')}</span>
             </div>
@@ -672,13 +718,13 @@ const ImprovedMiniPOS = () => {
           <div className="border-b border-dashed border-black my-2"></div>
           <div className="text-center mt-4">
             <div className="border-t border-b border-solid border-black py-1 my-2">
-              <p className="font-bold text-sm">*** CUPOM NÃO FISCAL ***</p>
+              <p className={cn("font-bold", printFormat === '80mm' ? "text-sm" : "text-lg")}>*** CUPOM NÃO FISCAL ***</p>
             </div>
             <p>Obrigado pela preferência!</p>
             <p>Volte sempre!</p>
-            <p className="mt-2 text-[9px] text-gray-500">Impresso por StockPro</p>
           </div>
         </div>
+      </>
       )}
     </>
   );

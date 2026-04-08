@@ -139,7 +139,7 @@ All colors MUST be HSL.
 
   /* Reset body and hide scrollbars */
   body {
-    overflow: hidden !important;
+    overflow: visible !important;
     background: white !important;
   }
 }
