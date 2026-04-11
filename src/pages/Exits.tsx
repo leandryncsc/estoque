@@ -144,6 +144,35 @@ const Exits = () => {
     sum + (exit.quantity * Number(exit.products?.sale_price || 0)), 0
   );
 
+  /** Texto amigável para motivos gerados pelo PDV (legado com UUID ou ref. curta). */
+  const getExitReasonDisplay = (reason: string | null) => {
+    if (!reason) return null;
+    const legacy = reason.match(/^Venda\s*-\s*ID:\s*([0-9a-f-]{36})$/i);
+    if (legacy) {
+      return {
+        title: "Venda registrada no PDV",
+        detail: `Ref. pedido ${legacy[1].slice(-8).toUpperCase()}`,
+      };
+    }
+    const comPagamento = reason.match(
+      /^Venda no PDV · pagamento:\s*(.+?) · ref\.\s*([A-Z0-9]+)$/i
+    );
+    if (comPagamento) {
+      return {
+        title: "Venda registrada no PDV",
+        detail: `Pagamento: ${comPagamento[1].trim()} · Ref. pedido ${comPagamento[2]}`,
+      };
+    }
+    const novo = reason.match(/^Venda no PDV · ref\.\s*([A-Z0-9]+)$/i);
+    if (novo) {
+      return {
+        title: "Venda registrada no PDV",
+        detail: `Ref. pedido ${novo[1]}`,
+      };
+    }
+    return { title: reason, detail: undefined as string | undefined };
+  };
+
   const getReasonBadge = (reason: string | null) => {
     if (!reason) return null;
     
@@ -360,11 +389,23 @@ const Exits = () => {
                         </span>
                       </div>
                     </div>
-                    {exit.reason && (
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        <strong>Motivo:</strong> {exit.reason}
-                      </p>
-                    )}
+                    {exit.reason && (() => {
+                      const parsed = getExitReasonDisplay(exit.reason);
+                      if (!parsed) return null;
+                      return (
+                        <div className="mt-2 space-y-0.5 text-sm">
+                          <p className="text-muted-foreground">
+                            <span className="font-medium text-foreground">Motivo:</span>{" "}
+                            {parsed.title}
+                          </p>
+                          {parsed.detail && (
+                            <p className="text-xs text-muted-foreground font-mono break-all">
+                              {parsed.detail}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                   <div className="text-right">
                     <Badge className="bg-destructive/10 text-destructive border-destructive/20">
