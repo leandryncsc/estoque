@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 
@@ -34,7 +35,6 @@ app.use('/api/users', usersRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/settings', settingsRoutes);
 
-// Rotas públicas auxiliares (para o login/cadastro)
 app.get('/api/public/filiais', async (req, res) => {
   try {
     const filiais = await prisma.filiais.findMany({
@@ -55,6 +55,13 @@ app.get('/api/public/check-admin', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Erro ao verificar admins' });
   }
+});
+
+const frontendDist = path.join(__dirname, '..', '..', 'dist');
+app.use(express.static(frontendDist));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendDist, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3001;

@@ -14,6 +14,10 @@ window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
 	return originalFetch(input, init);
 };
 
+if (API_URL) {
+	console.warn("Usando API_URL externa (Railway/outro):", API_URL);
+}
+
 createRoot(document.getElementById("root")!).render(
 	<ThemeProvider>
 		<App />

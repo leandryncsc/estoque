@@ -1,5 +1,11 @@
 {
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
-  ]
+  ],
+  "build": {
+    "command": "cross-env NODE_ENV=production npm run build:all",
+    "output": "dist"
+  },
+  "command": "node dist/index.js",
+  "packageManager": "npm"
 }
