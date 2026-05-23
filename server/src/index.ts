@@ -57,14 +57,18 @@ app.get('/api/public/check-admin', async (req, res) => {
   }
 });
 
-const frontendDist = path.join(__dirname, '..', '..', 'dist');
-app.use(express.static(frontendDist));
+if (process.env.VERCEL !== '1') {
+  const frontendDist = path.join(__dirname, '..', '..', 'dist');
+  app.use(express.static(frontendDist));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendDist, 'index.html'));
-});
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+  });
+}
+
+export default app;
