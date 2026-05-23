@@ -11,8 +11,13 @@ const prisma = new PrismaClient();
 
 import authRoutes from './routes/auth';
 
-app.use(cors());
+// Middleware
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:8080'],
+  credentials: true
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 import productsRoutes from './routes/products';
 import suppliersRoutes from './routes/suppliers';
@@ -61,7 +66,7 @@ if (process.env.VERCEL !== '1') {
   const frontendDist = path.join(__dirname, '..', '..', 'dist');
   app.use(express.static(frontendDist));
 
-  app.get('/{*path}', (req, res) => {
+  app.get('*', (req, res) => {
     res.sendFile(path.join(frontendDist, 'index.html'));
   });
 

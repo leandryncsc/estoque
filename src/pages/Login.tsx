@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingCart, Package, Users, BarChart3 } from "lucide-react";
+import { apiCall } from "@/lib/api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -30,13 +31,13 @@ const Login = () => {
     if (!registerOpen) return;
     (async () => {
       try {
-        const adminRes = await fetch('/api/public/check-admin');
+        const adminRes = await apiCall('/public/check-admin');
         if (adminRes.ok) {
           const adminExists = await adminRes.json();
           setHasAdmin(adminExists);
         }
 
-        const filiaisRes = await fetch('/api/public/filiais');
+        const filiaisRes = await apiCall('/public/filiais');
         if (filiaisRes.ok) {
           const data = await filiaisRes.json();
           setFiliais(data);
@@ -52,9 +53,8 @@ const Login = () => {
     setLoginError(null);
     setLoginLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await apiCall('/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
       const data = await response.json();
@@ -85,9 +85,8 @@ const Login = () => {
     setRegisterLoading(true);
     
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await apiCall('/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: registerForm.email,
           password: registerForm.password,
