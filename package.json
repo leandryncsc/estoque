@@ -12,6 +12,9 @@
     "build:server": "tsc -p server/tsconfig.json && npx prisma generate --schema=server/prisma/schema.prisma",
     "build:all": "npm run build && npm run build:server",
     "start": "cross-env NODE_ENV=production node server/dist/index.js",
+    "db:init": "npx ts-node --project server/tsconfig.json server/src/scripts/init-db.ts",
+    "db:push": "npx prisma db push --schema=server/prisma/schema.prisma",
+    "db:migrate": "npx prisma migrate deploy --schema=server/prisma/schema.prisma",
     "lint": "eslint .",
     "preview": "vite preview"
   },

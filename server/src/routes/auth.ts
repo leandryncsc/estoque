@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest, authenticateToken } from '../middleware/auth';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-mude-em-producao';
 
 // Rota de login
@@ -17,17 +16,21 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email e senha são obrigatórios' });
     }
 
+    console.log(`[AUTH] Tentativa de login com email: ${email}`);
+
     const user = await prisma.profiles.findUnique({
       where: { email },
     });
 
     if (!user) {
+      console.log(`[AUTH] Usuário não encontrado: ${email}`);
       return res.status(401).json({ error: 'Credenciais inválidas' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
+      console.log(`[AUTH] Senha inválida para: ${email}`);
       return res.status(401).json({ error: 'Credenciais inválidas' });
     }
 
@@ -42,6 +45,8 @@ router.post('/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    console.log(`[AUTH] Login bem-sucedido para: ${email}`);
+
     res.json({
       token,
       user: {
@@ -53,7 +58,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Erro no login:', error);
+    console.error('[AUTH] Erro no login:', error);
     res.status(500).json({ error: 'Erro interno no servidor' });
   }
 });
