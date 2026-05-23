@@ -1,8 +1,6 @@
 {
-  "build": {
-    "command": "cross-env NODE_ENV=production npm run build:all",
-    "output": "dist"
-  },
+  "buildCommand": "cross-env NODE_ENV=production npm run build:all",
+  "outputDirectory": "dist",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" }
   ]
