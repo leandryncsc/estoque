@@ -61,7 +61,7 @@ if (process.env.VERCEL !== '1') {
   const frontendDist = path.join(__dirname, '..', '..', 'dist');
   app.use(express.static(frontendDist));
 
-  app.get('*', (req, res) => {
+  app.get('/{*path}', (req, res) => {
     res.sendFile(path.join(frontendDist, 'index.html'));
   });
 
