@@ -1,4 +1,7 @@
 import { VercelResponse } from '@vercel/node';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-mude-em-producao';
 
 export const withAuth = async (req: any, res: VercelResponse, handler: Function) => {
   const authHeader = req.headers['authorization'];
@@ -9,9 +12,6 @@ export const withAuth = async (req: any, res: VercelResponse, handler: Function)
   }
 
   try {
-    const jwt = await import('jsonwebtoken');
-    const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-mude-em-producao';
-    
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     return handler(req, res);
