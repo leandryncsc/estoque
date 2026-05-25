@@ -8,7 +8,7 @@
     "dev:front": "vite",
     "dev:back": "tsx watch backend/index.ts",
     "dev:vercel": "vercel dev",
-    "build": "vite build",
+    "build": "prisma generate && vite build",
     "build:back": "tsc -p backend/tsconfig.json",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
