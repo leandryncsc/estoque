@@ -1,0 +1,38 @@
+import { VercelRequest, VercelResponse } from '@vercel/node';
+import prisma from '../lib/prisma.js';
+import { withCors, withAuth } from '../lib/utils.js';
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (withCors(req, res)) return;
+
+  return withAuth(req, res, async (authReq: any, authRes: VercelResponse) => {
+    try {
+      if (req.method === 'GET') {
+        const suppliers = await prisma.suppliers.findMany({ orderBy: { name: 'asc' } });
+        return authRes.json(suppliers);
+      } else if (req.method === 'POST') {
+        const { name, cnpj_cpf, address, phone, email } = req.body;
+        const newSupplier = await prisma.suppliers.create({ data: { name, cnpj_cpf, address, phone, email } });
+        return authRes.status(201).json(newSupplier);
+      } else if (req.method === 'PUT') {
+        const id = authReq.query?.id as string;
+        const { name, cnpj_cpf, address, phone, email } = req.body;
+        const updatedSupplier = await prisma.suppliers.update({
+          where: { id },
+          data: { name, cnpj_cpf, address, phone, email },
+        });
+        return authRes.json(updatedSupplier);
+      } else if (req.method === 'DELETE') {
+        const id = authReq.query?.id as string;
+        await prisma.suppliers.delete({ where: { id } });
+        return authRes.json({ message: 'Fornecedor deletado com sucesso' });
+      }
+
+      authRes.status(404).json({ error: 'Método não suportado' });
+    } catch (error) {
+      console.error('Erro ao processar fornecedores:', error);
+      authRes.status(500).json({ error: 'Erro ao processar fornecedores' });
+    }
+  });
+}
+

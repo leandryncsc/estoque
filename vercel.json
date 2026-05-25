@@ -2,7 +2,12 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/api/filiais/(?<id>[^/]+)", "destination": "/api/filiais?id=$id" },
+    { "source": "/api/products/(?<id>[^/]+)", "destination": "/api/products?id=$id" },
+    { "source": "/api/suppliers/(?<id>[^/]+)", "destination": "/api/suppliers?id=$id" },
+    { "source": "/api/users/(?<id>[^/]+)", "destination": "/api/users?id=$id" },
+    { "source": "/api/public/(.*)", "destination": "/api/public" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
