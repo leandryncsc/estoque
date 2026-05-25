@@ -36,3 +36,5 @@ prisma/migrations
 
 # Old server directory (removed)
 server/
+
+.vercel
