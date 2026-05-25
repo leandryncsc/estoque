@@ -1,15 +1,14 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
-import { AuthRequest, authenticateToken } from '../middleware/auth';
+import crypto from 'crypto';
+import prisma from '../lib/prisma';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
-const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-mude-em-producao';
 
-// Rota de login
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res: Response) => {
   try {
     const { email, password } = req.body;
 
@@ -32,34 +31,33 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        email: user.email, 
+      {
+        id: user.id,
+        email: user.email,
         role: user.role,
-        filial_id: user.filial_id 
+        filial_id: user.filial_id,
       },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    res.json({
+    return res.json({
       token,
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
         role: user.role,
-        filial_id: user.filial_id
-      }
+        filial_id: user.filial_id,
+      },
     });
   } catch (error) {
-    console.error('Erro no login:', error);
+    console.error('Erro na autenticação:', error);
     res.status(500).json({ error: 'Erro interno no servidor' });
   }
 });
 
-// Registrar (se quiser permitir registro aberto ou por admin)
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res: Response) => {
   try {
     const { email, password, name, role, filial_id } = req.body;
 
@@ -84,26 +82,25 @@ router.post('/register', async (req, res) => {
         name,
         role: role || 'seller',
         filial_id: filial_id || null,
-        user_id: crypto.randomUUID() // Fallback unique ID since we don't have supabase auth anymore
+        user_id: crypto.randomUUID(),
       },
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: 'Usuário criado com sucesso',
       user: {
         id: newUser.id,
         email: newUser.email,
         name: newUser.name,
-      }
+      },
     });
   } catch (error) {
-    console.error('Erro no registro:', error);
+    console.error('Erro na autenticação:', error);
     res.status(500).json({ error: 'Erro interno no servidor' });
   }
 });
 
-// Obter usuário logado atual
-router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
+router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const user = await prisma.profiles.findUnique({
       where: { id: req.user?.id },
@@ -113,7 +110,7 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
         name: true,
         role: true,
         filial_id: true,
-      }
+      },
     });
 
     if (!user) {
@@ -122,6 +119,7 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
 
     res.json(user);
   } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
     res.status(500).json({ error: 'Erro interno' });
   }
 });

@@ -1,42 +1,37 @@
-import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/auth';
+import { Router, Response } from 'express';
+import prisma from '../lib/prisma';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
-const prisma = new PrismaClient();
 
-// Buscar configurações
-router.get('/', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    // Usando $queryRaw para evitar problemas temporários de tipagem caso o prisma generate falhe devido ao lock
     const settings = await prisma.$queryRaw`SELECT * FROM system_settings WHERE id = '1'`;
-    
+
     if (Array.isArray(settings) && settings.length > 0) {
-      res.json(settings[0]);
-    } else {
-      // Se não houver configurações, retornamos valores padrões
-      res.json({
-        companyName: "Supermercado",
-        companyEmail: "admin@supermercado.com",
-        companyPhone: "",
-        companyAddress: "",
-        lowStockAlert: 10,
-        enableNotifications: true,
-        enableEmailAlerts: false,
-        enableLowStockAlerts: true,
-        autoBackup: true,
-        darkMode: false,
-        compactView: false
-      });
+      return res.json(settings[0]);
     }
+
+    res.json({
+      companyName: 'Supermercado',
+      companyEmail: 'admin@supermercado.com',
+      companyPhone: '',
+      companyAddress: '',
+      lowStockAlert: 10,
+      enableNotifications: true,
+      enableEmailAlerts: false,
+      enableLowStockAlerts: true,
+      autoBackup: true,
+      darkMode: false,
+      compactView: false,
+    });
   } catch (error) {
-    console.error('Erro ao buscar configurações:', error);
-    res.status(500).json({ error: 'Erro ao buscar configurações' });
+    console.error('Erro ao processar configurações:', error);
+    res.status(500).json({ error: 'Erro ao processar configurações' });
   }
 });
 
-// Atualizar configurações
-router.put('/', authenticateToken, async (req, res) => {
+router.put('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const {
       companyName,
@@ -49,15 +44,13 @@ router.put('/', authenticateToken, async (req, res) => {
       enableLowStockAlerts,
       autoBackup,
       darkMode,
-      compactView
+      compactView,
     } = req.body;
 
     const existing = await prisma.$queryRaw`SELECT id FROM system_settings WHERE id = '1'`;
 
-    let result;
     if (Array.isArray(existing) && existing.length > 0) {
-      // Atualizar
-      result = await prisma.$executeRaw`
+      await prisma.$executeRaw`
         UPDATE system_settings
         SET 
           "companyName" = ${companyName},
@@ -75,8 +68,7 @@ router.put('/', authenticateToken, async (req, res) => {
         WHERE id = '1'
       `;
     } else {
-      // Inserir
-      result = await prisma.$executeRaw`
+      await prisma.$executeRaw`
         INSERT INTO system_settings (
           id, 
           "companyName", 
@@ -108,11 +100,11 @@ router.put('/', authenticateToken, async (req, res) => {
         )
       `;
     }
-    
+
     res.json({ success: true });
   } catch (error) {
-    console.error('Erro ao atualizar configurações:', error);
-    res.status(500).json({ error: 'Erro ao atualizar configurações' });
+    console.error('Erro ao processar configurações:', error);
+    res.status(500).json({ error: 'Erro ao processar configurações' });
   }
 });
 

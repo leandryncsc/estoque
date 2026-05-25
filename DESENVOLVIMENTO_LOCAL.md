@@ -4,10 +4,10 @@
 
 ```bash
 # Primeira vez
-npm install -g vercel
+npm install
 
 # Toda vez que quer desenvolver
-npm run dev:vercel
+npm run dev
 
 # Acesse http://localhost:3000
 ```
@@ -16,35 +16,20 @@ npm run dev:vercel
 
 ## Como Rodar em Desenvolvimento
 
-### Opção 1: Com Vercel Dev (Recomendado) ⭐
-
-**Primeira vez:**
-
-```bash
-# Instalar Vercel CLI globalmente
-npm install -g vercel
-
-# Fazer login no Vercel (opcional, mas recomendado)
-vercel login
-```
-
-**Sempre que quiser desenvolver:**
+### Opção 1: Full Stack (Recomendado) ⭐
 
 ```bash
 # Na pasta do projeto
-npm run dev:vercel
-
-# Ou use o alias
-npm start
+npm run dev
 ```
 
 Isso vai:
 
 - ✓ Rodar o frontend em `http://localhost:3000` (Vite)
-- ✓ Rodar as APIs em `http://localhost:3000/api` (Vercel Functions)
+- ✓ Rodar as APIs em `http://localhost:3001` (Express)
+- ✓ Proxy automático: o Vite redireciona `/api/*` para o Express
 - ✓ Carregar as variáveis do `.env` e `.env.local`
-- ✓ Usar hot-reload para mudanças
-- ✓ Simular exatamente como funciona em produção
+- ✓ Hot-reload tanto no frontend quanto no backend
 
 **Acesse**: http://localhost:3000
 
@@ -53,23 +38,27 @@ Isso vai:
 Se quiser apenas testar o frontend sem as APIs:
 
 ```bash
-npm run dev
+npm run dev:front
 ```
 
-Isso vai rodar apenas o Vite em `http://localhost:3000`, mas as APIs não funcionarão localmente.
-Use quando quiser trabalhar apenas na UI/UX sem mexer com backend.
+Isso vai rodar apenas o Vite em `http://localhost:3000`, mas as APIs não funcionarão.
 
-### Opção 3: Produção Local (Preview Build)
-
-Para simular exatamente como ficará em produção:
+### Opção 3: Backend Apenas
 
 ```bash
-# Build para produção
+npm run dev:back
+```
+
+Roda apenas o servidor Express em `http://localhost:3001`.
+
+### Opção 4: Produção Local (Preview Build)
+
+```bash
+# Build do frontend
 npm run build
 
-# Preview local (simula Vercel)
-vercel build
-vercel start
+# Preview do frontend
+npm run preview
 ```
 
 ---
@@ -79,7 +68,12 @@ vercel start
 ```
 estoque/
 ├── src/                    ← Frontend React (hot-reload)
-├── api/                    ← Backend API Routes (hot-reload)
+├── backend/                ← Backend Express (hot-reload com tsx)
+│   ├── index.ts            ← Entry point
+│   ├── routes/             ← Rotas da API
+│   ├── middleware/         ← Middleware (auth, etc.)
+│   └── lib/                ← Prisma client
+├── api/                    ← Vercel Functions (apenas para deploy)
 ├── .env                    ← Variáveis públicas (commitar)
 ├── .env.local              ← Variáveis privadas (NÃO commitar)
 └── .gitignore              ← Já configurado para .env.local
@@ -117,13 +111,15 @@ Variáveis de produção - não existem em arquivo local.
 
 ```bash
 # Desenvolvimento
-npm run dev:vercel       # Frontend + APIs (localhost:3000) ⭐
-npm run dev              # Frontend apenas (localhost:3000)
-npm start                # Alias para dev:vercel
+npm run dev              # Frontend + Backend (localhost:3000) ⭐
+npm run dev:front        # Frontend apenas (localhost:3000)
+npm run dev:back         # Backend Express apenas (localhost:3001)
+npm start                # Alias para dev
 
 # Build & Preview
-npm run build            # Build Vite
-npm run preview          # Preview do build
+npm run build            # Build Vite (frontend)
+npm run build:back       # Build TypeScript do backend
+npm run preview          # Preview do build do frontend
 
 # Prisma
 npm run prisma:generate  # Gerar cliente Prisma
@@ -139,11 +135,13 @@ npm run lint             # Verificar código
 
 ## Testando APIs em Desenvolvimento
 
-### Com Vercel Dev (localhost:3000)
+### Com o servidor rodando (localhost:3001 direto ou :3000 via proxy)
 
 ```bash
 # Listar filiais (público)
 curl http://localhost:3000/api/public/filiais
+# Ou direto no backend
+curl http://localhost:3001/api/public/filiais
 
 # Login
 curl -X POST http://localhost:3000/api/auth \
@@ -154,18 +152,6 @@ curl -X POST http://localhost:3000/api/auth \
 TOKEN="seu_token_aqui"
 curl http://localhost:3000/api/products \
   -H "Authorization: Bearer $TOKEN"
-```
-
-### Com Frontend Apenas (localhost:3000)
-
-Você precisa alterar `VITE_API_URL` em `.env.local`:
-
-```env
-# Para uma API em produção
-VITE_API_URL=https://seu-projeto.vercel.app/api
-
-# Ou deixe vazio para usar requisições relativas
-VITE_API_URL=
 ```
 
 ---
@@ -213,13 +199,13 @@ taskkill /PID <PID> /F
 
 ### "Erro: ECONNREFUSED em /api"
 
-**Problema**: Vercel Dev não está rodando ou APIs não carregaram
+**Problema**: Backend Express não está rodando
 
 **Solução**:
 
-1. Aguarde a build das APIs terminar (veja na saída do terminal)
-2. Verifique se não há erros em arquivos dentro de `/api`
-3. Ctrl+C e rode `npm run dev:vercel` novamente
+1. Verifique se o backend está rodando: `npm run dev:back`
+2. Verifique se a porta 3001 está livre
+3. Ctrl+C e rode `npm run dev` novamente
 
 ### "Porta 3000 já está em uso"
 
@@ -274,9 +260,9 @@ npm run dev:vercel
 ## Fluxo de Desenvolvimento
 
 ```
-1. npm run dev:vercel
+1. npm run dev
    ↓
-2. Faça mudanças em src/ ou api/
+2. Faça mudanças em src/ ou backend/
    ↓
 3. Hot-reload automático (Ctrl+Shift+R para forçar browser)
    ↓
@@ -284,14 +270,14 @@ npm run dev:vercel
    ↓
 5. Quando satisfeito, commit e push
    ↓
-6. Vercel faz deploy automático
+6. Vercel faz deploy automático (usando api/ para serverless)
 ```
 
 ---
 
 ## Boas Práticas
 
-✅ Use `npm run dev:vercel` para desenvolvimento completo
+✅ Use `npm run dev` para desenvolvimento completo
 ✅ Coloque dados sensíveis em `.env.local` (nunca commitar!)
 ✅ Teste as APIs com curl ou Postman
 ✅ Use Prisma Studio para debugar banco de dados
@@ -304,10 +290,10 @@ npm run dev:vercel
 
 - [ ] Node.js v18+ instalado (`node --version`)
 - [ ] npm packages instalados (`npm install`)
-- [ ] Vercel CLI instalado (`npm install -g vercel`)
+- [ ] Backend Express configurado
 - [ ] `.env.local` criado com suas variáveis
 - [ ] `DATABASE_URL` está funcionando
-- [ ] `npm run dev:vercel` roda sem erros
+- [ ] `npm run dev` roda sem erros
 - [ ] http://localhost:3000 carrega
 - [ ] `/api/public/filiais` retorna dados
 
@@ -315,7 +301,7 @@ npm run dev:vercel
 
 ## Próximos Passos
 
-1. ✅ Rode `npm run dev:vercel`
+1. ✅ Rode `npm run dev`
 2. ✅ Acesse http://localhost:3000
 3. ✅ Teste as APIs (veja EXEMPLOS_API.md)
 4. ✅ Faça suas mudanças
