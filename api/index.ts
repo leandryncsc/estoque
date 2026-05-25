@@ -1,28 +1,33 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import authRoutes from '../backend/routes/auth';
+import productsRoutes from '../backend/routes/products';
+import suppliersRoutes from '../backend/routes/suppliers';
+import salesRoutes from '../backend/routes/sales';
+import stockMovementsRoutes from '../backend/routes/stock-movements';
+import dashboardRoutes from '../backend/routes/dashboard';
+import filiaisRoutes from '../backend/routes/filiais';
+import usersRoutes from '../backend/routes/users';
+import reportsRoutes from '../backend/routes/reports';
+import settingsRoutes from '../backend/routes/settings';
+import publicRoutes from '../backend/routes/public';
 
 const app = express();
-let loaded = false;
 
-export default async (req: any, res: any) => {
-  if (!loaded) {
-    app.use(cors());
-    app.use(express.json());
+app.use(cors());
+app.use(express.json());
 
-    app.use('/api/auth', (await import('../backend/routes/auth')).default);
-    app.use('/api/products', (await import('../backend/routes/products')).default);
-    app.use('/api/suppliers', (await import('../backend/routes/suppliers')).default);
-    app.use('/api/sales', (await import('../backend/routes/sales')).default);
-    app.use('/api/stock-movements', (await import('../backend/routes/stock-movements')).default);
-    app.use('/api/dashboard', (await import('../backend/routes/dashboard')).default);
-    app.use('/api/filiais', (await import('../backend/routes/filiais')).default);
-    app.use('/api/users', (await import('../backend/routes/users')).default);
-    app.use('/api/reports', (await import('../backend/routes/reports')).default);
-    app.use('/api/settings', (await import('../backend/routes/settings')).default);
-    app.use('/api/public', (await import('../backend/routes/public')).default);
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/suppliers', suppliersRoutes);
+app.use('/api/sales', salesRoutes);
+app.use('/api/stock-movements', stockMovementsRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/filiais', filiaisRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/public', publicRoutes);
 
-    loaded = true;
-  }
-  return app(req, res);
-};
+export default app;
