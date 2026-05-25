@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model customers {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  cpf_cnpj   String?
+  phone      String?
+  email      String?
+  address    String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  filial_id  String?  @db.Uuid
+}
+
+model filiais {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome       String    @db.VarChar
+  endereco   String?   @db.VarChar
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model products {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  sku            String?  @unique
+  category       String?
+  cost_price     Decimal  @default(0) @db.Decimal
+  sale_price     Decimal  @default(0) @db.Decimal
+  stock_quantity Int      @default(0)
+  supplier_id    String?  @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  filial_id      String?  @db.Uuid
+}
+
+model profiles {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String   @unique @db.Uuid
+  email      String   @unique @default("admin@admin.com")
+  password   String   @default("$2a$10$X87/C/Gz6oD9iC.3H9wQ1OT84X22K52u2E1DqH5G7UvWd.1mG9eKG")
+  name       String
+  role       String   @default("seller")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  filial_id  String?  @db.Uuid
+}
+
+model sale_items {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sale_id     String   @db.Uuid
+  product_id  String   @db.Uuid
+  quantity    Int
+  unit_price  Decimal  @db.Decimal
+  total_price Decimal  @db.Decimal
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  filial_id   String?  @db.Uuid
+}
+
+model sales {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id    String?  @db.Uuid
+  total_amount   Decimal  @default(0) @db.Decimal
+  payment_method String
+  user_id        String   @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  filial_id      String?  @db.Uuid
+}
+
+model stock_movements {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  product_id    String   @db.Uuid
+  movement_type String
+  quantity      Int
+  reason        String?
+  cost_price    Decimal? @db.Decimal
+  user_id       String   @db.Uuid
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  filial_id     String?  @db.Uuid
+}
+
+model suppliers {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  cnpj_cpf   String?
+  address    String?
+  phone      String?
+  email      String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+}
+
+enum payment_method {
+  dinheiro
+  cartao_debito
+  cartao_credito
+  pix
+}
+
+enum stock_movement_type {
+  entrada
+  saida
+}
+
+enum user_role {
+  admin
+  seller
+}
+
+model system_settings {
+  id                   String   @id @default("1")
+  companyName          String   @default("Supermercado")
+  companyEmail         String   @default("admin@supermercado.com")
+  companyPhone         String   @default("")
+  companyAddress       String   @default("")
+  lowStockAlert        Int      @default(10)
+  enableNotifications  Boolean  @default(true)
+  enableEmailAlerts    Boolean  @default(false)
+  enableLowStockAlerts Boolean  @default(true)
+  autoBackup           Boolean  @default(true)
+  darkMode             Boolean  @default(false)
+  compactView          Boolean  @default(false)
+  updated_at           DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+}
